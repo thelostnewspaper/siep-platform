@@ -1,0 +1,38 @@
+# Python ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+backend/siep.db
+
+# Certificates & Keys (Never commit private keys!)
+backend/certs/*.key
+backend/certs/*.pem
+backend/certs/*.crt
+!backend/certs/.gitkeep
+
+# Node ignores
+node_modules/
+dist/
+dist-ssr/
+*.local
+frontend/node_modules/
+frontend/dist/
+
+# OS ignores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
