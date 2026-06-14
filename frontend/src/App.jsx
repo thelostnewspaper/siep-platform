@@ -399,10 +399,10 @@ export default function App() {
         
         {/* TABS 1: ASSET DIRECTORY */}
         {activeTab === 'dashboard' && (
-          <div className="dashboard-grid-2x1">
-            
-            {/* Devices panel */}
-            <div className="panel">
+          <div>
+
+            {/* Devices panel — full width */}
+            <div className="panel" style={{ marginBottom: '16px' }}>
               <div className="panel-header">
                 <div className="panel-title">
                   <h3>Connected Industrial Hardware</h3>
@@ -415,10 +415,10 @@ export default function App() {
                     <tr>
                       <th>Device ID</th>
                       <th>Type</th>
-                      <th>Gateway Node</th>
+                      <th>Gateway</th>
                       <th>IP Address</th>
-                      <th>Firmware</th>
-                      <th>Trust Score</th>
+                      <th>FW</th>
+                      <th>Trust</th>
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
@@ -429,12 +429,12 @@ export default function App() {
                         <td><strong>{d.device_id}</strong></td>
                         <td>{d.device_type}</td>
                         <td>{d.gateway_node}</td>
-                        <td><code>{d.ip_address}</code></td>
+                        <td><code style={{ fontSize: '0.8rem' }}>{d.ip_address}</code></td>
                         <td>{d.firmware_version}</td>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontWeight: 600, minWidth: '28px' }}>{d.trust_score}%</span>
-                            <div className="trust-bar-container">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontWeight: 600, minWidth: '34px', fontSize: '0.8rem' }}>{d.trust_score}%</span>
+                            <div className="trust-bar-container" style={{ width: '60px' }}>
                               <div 
                                 className="trust-bar-fill" 
                                 style={{ 
@@ -451,9 +451,9 @@ export default function App() {
                           </span>
                         </td>
                         <td>
-                          <div style={{ display: 'flex', gap: '6px' }}>
+                          <div style={{ display: 'flex', gap: '4px' }}>
                             {d.status === 'blocked' ? (
-                              <button className="btn btn-secondary btn-sm" onClick={() => handleManualOverride(d.device_id, 'RESTORE')}>Re-authorize</button>
+                              <button className="btn btn-secondary btn-sm" onClick={() => handleManualOverride(d.device_id, 'RESTORE')}>Re-auth</button>
                             ) : (
                               <>
                                 <button className="btn btn-danger btn-sm" onClick={() => handleManualOverride(d.device_id, 'BLOCK')}>Block</button>
@@ -479,17 +479,17 @@ export default function App() {
               </div>
             </div>
 
-            {/* Attack simulation control */}
+            {/* Threat simulation — full width, compact horizontal layout */}
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
                   <h3>Threat Simulation Panel</h3>
-                  <p>Inject operational attack vectors to validate the Zero Trust automated response.</p>
+                  <p>Inject attack vectors to validate the Zero Trust automated response.</p>
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Select Target Device</label>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div className="form-group" style={{ flex: 1, minWidth: '180px', marginBottom: 0 }}>
+                  <label className="form-label">Target Device</label>
                   <select 
                     className="form-control"
                     value={selectedDeviceForAttack}
@@ -503,38 +503,36 @@ export default function App() {
                   </select>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Select Threat Vector</label>
+                <div className="form-group" style={{ flex: 2, minWidth: '240px', marginBottom: 0 }}>
+                  <label className="form-label">Threat Vector</label>
                   <select 
                     className="form-control"
                     value={selectedAttackType}
                     onChange={(e) => setSelectedAttackType(e.target.value)}
                   >
-                    <option value="ddos">DDoS Traffic Flooding (20x traffic rate)</option>
-                    <option value="invalid_cert">Certificate Hijack (Failed Cryptographic Signature)</option>
-                    <option value="rogue">Rogue Endpoint Connection (Unregistered cert access)</option>
-                    <option value="sql_injection">Malicious Payload Injection (SQL statement triggers)</option>
-                    <option value="physical_tampering">Physical Node Tampering (Plausibility violation)</option>
+                    <option value="ddos">DDoS Traffic Flooding</option>
+                    <option value="invalid_cert">Certificate Hijack</option>
+                    <option value="rogue">Rogue Endpoint Connection</option>
+                    <option value="sql_injection">Malicious Payload Injection</option>
+                    <option value="physical_tampering">Physical Node Tampering</option>
                   </select>
                 </div>
 
-                <button className="btn btn-primary" onClick={triggerAttack} style={{ alignSelf: 'flex-start' }}>
-                  Inject Threat Vector
-                </button>
-                
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={async () => {
-                    await fetch(`${BASE_URL}/api/clear_attack`, { method: 'POST' });
-                    alert('Simulation state reset to normal.');
-                  }}
-                  style={{ alignSelf: 'flex-start', marginTop: '-8px' }}
-                >
-                  Reset Telemetry to Normal
-                </button>
+                <div style={{ display: 'flex', gap: '8px', flexShrink: 0, paddingBottom: '2px' }}>
+                  <button className="btn btn-primary" onClick={triggerAttack}>Inject</button>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={async () => {
+                      await fetch(`${BASE_URL}/api/clear_attack`, { method: 'POST' });
+                      alert('Simulation state reset to normal.');
+                    }}
+                  >
+                    Reset
+                  </button>
+                </div>
 
-                <div style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius)', backgroundColor: 'var(--bg-primary)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  <strong>NIS2 Target:</strong> This checks continuous verification. Running an attack drops device trust score, triggers an alert, synchronizes the block across all gateways, and updates the incident response logs automatically.
+                <div className="info-box info-box-sky" style={{ fontSize: '0.78rem', flex: '1 1 300px' }}>
+                  <strong>NIS2:</strong> Attack drops device trust score, triggers alert, synchronizes block across all gateways, and logs the incident automatically.
                 </div>
               </div>
             </div>
@@ -626,19 +624,19 @@ export default function App() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 
                 <div style={{ display: 'flex', gap: '16px' }}>
-                  <div style={{ flex: 1, padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius)' }}>
+                  <div className="mini-stat" style={{ flex: 1 }}>
                     <h4 style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Sync State</h4>
                     <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: '8px 0 2px' }}>Fully Synced</p>
                     <span style={{ fontSize: '0.75rem', color: 'var(--success)' }}>✔ Gateways active & peering</span>
                   </div>
-                  <div style={{ flex: 1, padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius)' }}>
+                  <div className="mini-stat" style={{ flex: 1 }}>
                     <h4 style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Shared Blacklist</h4>
                     <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: '8px 0 2px' }}>{meshStatus.blocklist.length} IP Block rules</p>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Distributed Firewall Drop</span>
                   </div>
                 </div>
 
-                <div style={{ padding: '16px', backgroundColor: 'var(--bg-tertiary)', borderRadius: 'var(--radius)' }}>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-tertiary)', border: '2px solid var(--border-color)' }}>
                   <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '10px' }}>Active Peering Nodes</h4>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
                     {meshStatus.gateways.map(g => (
@@ -710,7 +708,7 @@ export default function App() {
               {agentThinking ? (
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', marginBottom: '16px' }}>
-                    <span style={{ fontWeight: 600 }}>Target: <code style={{ backgroundColor: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: '4px' }}>{agentThinking.device_id}</code></span>
+                    <span style={{ fontWeight: 600 }}>Target: <code style={{ backgroundColor: 'var(--lavender)', padding: '2px 6px', border: '1px solid var(--border-color)' }}>{agentThinking.device_id}</code></span>
                     <span className="badge badge-danger" style={{ marginLeft: 'auto' }}>{agentThinking.action}</span>
                   </div>
                   
@@ -733,7 +731,7 @@ export default function App() {
                   </div>
                 </div>
               ) : (
-                <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 20px', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius)' }}>
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 20px', border: '2px dashed var(--border-color)', backgroundColor: 'var(--bg-tertiary)' }}>
                   <p><strong>Agent Inactive</strong></p>
                   <p style={{ fontSize: '0.8rem', marginTop: '6px' }}>
                     Agent dynamically runs when security violations occur. Inject a <strong>Threat Vector</strong> from the directory tab to see it make containment actions.
@@ -766,12 +764,12 @@ export default function App() {
                     className="form-control" 
                     readOnly 
                     rows="8" 
-                    style={{ fontFamily: 'monospace', fontSize: '0.75rem', backgroundColor: 'var(--bg-primary)' }}
+                    style={{ fontFamily: 'monospace', fontSize: '0.75rem', backgroundColor: 'var(--bg-tertiary)', border: '2px solid var(--border-color)' }}
                     value={rootCaPem}
                   />
                 </div>
                 
-                <div style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius)', fontSize: '0.8rem', backgroundColor: 'var(--bg-primary)' }}>
+                <div className="info-box info-box-mint" style={{ fontSize: '0.8rem' }}>
                   All nodes connecting to gateways must hold a client certificate signed by the Root CA above. The validation checks validity, timestamp intervals, and revoked lists.
                 </div>
               </div>
@@ -888,7 +886,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius)', backgroundColor: 'var(--bg-primary)' }}>
+                <div className="info-box info-box-lavender">
                   <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px' }}>Security Posture Score: C2 (Intermediate)</h4>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                     Your system maps to the Danish NIS2 critical infrastructure directive. Real-time logging and distributed firewalling satisfy standard controls.
@@ -898,7 +896,7 @@ export default function App() {
                   </p>
                 </div>
 
-                <div style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius)', backgroundColor: 'var(--bg-primary)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                <div className="info-box info-box-peach" style={{ fontSize: '0.8rem' }}>
                   <strong>Compliance note:</strong> SIEP records every action cryptographically. Incident responses decided by the autonomous agent can be downloaded from database audit records for legal reporting to authorities.
                 </div>
               </div>
@@ -987,7 +985,7 @@ export default function App() {
               </form>
             ) : (
               <div>
-                <div style={{ padding: '12px', backgroundColor: 'var(--success-light)', border: '1px solid var(--success-border)', borderRadius: 'var(--radius)', fontSize: '0.85rem', color: 'var(--success)', marginBottom: '16px' }}>
+                <div style={{ padding: '12px', backgroundColor: 'var(--success-light)', border: '2px solid var(--success-border)', fontSize: '0.85rem', color: '#1a8a6a', marginBottom: '16px' }}>
                   ✔ x509 2048-bit RSA client certificate cryptographically issued successfully!
                 </div>
                 <div className="form-group">
@@ -996,7 +994,7 @@ export default function App() {
                     className="form-control" 
                     readOnly 
                     rows="5" 
-                    style={{ fontFamily: 'monospace', fontSize: '0.75rem', backgroundColor: 'var(--bg-primary)' }}
+                    style={{ fontFamily: 'monospace', fontSize: '0.75rem', backgroundColor: 'var(--bg-tertiary)' }}
                     value={provisionedCertData.cert_pem}
                   />
                 </div>
@@ -1006,7 +1004,7 @@ export default function App() {
                     className="form-control" 
                     readOnly 
                     rows="5" 
-                    style={{ fontFamily: 'monospace', fontSize: '0.75rem', backgroundColor: 'var(--bg-primary)' }}
+                    style={{ fontFamily: 'monospace', fontSize: '0.75rem', backgroundColor: 'var(--bg-tertiary)' }}
                     value={provisionedCertData.private_key_pem}
                   />
                 </div>
